@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>VerbaCoin - O Jogo das Palavras Valiosas</title>
+  <style>
+    :root {
+      --primary: #0ff;
+      --secondary: #f0f;
+      --dark: #0e0e0e;
+      --dark-secondary: #1a1a1a;
+      --text: #ffffff;
+    }
+    
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: var(--dark-secondary);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 20px var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px var(--primary);
+    }
+    
+    .subtitle {
+      color: #aaa;
+      margin-bottom: 30px;
+    }
+    
+    .input-group {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    
+    input, select {
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background-color: #333;
+      color: white;
+    }
+    
+    input {
+      width: 70%;
+      margin-right: 10px;
+    }
+    
+    select {
+      width: 25%;
+    }
+    
+    button {
+      padding: 12px 25px;
+      background-color: var(--primary);
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      margin: 5px;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+    }
+    
+    .button-secondary {
+      background-color: var(--secondary);
+    }
+    
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 30px 0;
+    }
+    
+    .stat-box {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 8px;
+      width: 30%;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 5px 0;
+    }
+    
+    .tab-container {
+      margin-top: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #333;
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid var(--primary);
+      color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+      text-align: left;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .token-card {
+      background-color: #333;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      position: relative;
+      border-left: 5px solid var(--primary);
+    }
+    
+    .token-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--primary);
+    }
+    
+    .token-meta {
+      display: flex;
+      justify-content: space-between;
+      color: #aaa;
+      font-size: 14px;
+    }
+    
+    .token-actions {
+      margin-top: 10px;
+    }
+    
+    .token-actions button {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    
+    .challenge-card {
+      background-color: #222;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #444;
+    }
+    
+    .challenge-title {
+      color: var(--secondary);
+      font-weight: bold;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background-color: #444;
+      border-radius: 5px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      width: 0%;
+    }
+    
+    .battle-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+    
+    .battle-option {
+      width: 48%;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #333;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .battle-option:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+    
+    .battle-option.selected {
+      border: 2px solid var(--primary);
+    }
+    
+    .battle-votes {
+      margin-top: 10px;
+      color: #aaa;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(0, 255, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>VerbaCoin</h1>
+    <p class="subtitle">Onde palavras se transformam em riqueza digital</p>
+    
+    <div class="stats-container">
+      <div class="stat-box">
+        <div>Seu Saldo</div>
+        <div class="stat-value" id="coinCount">1,250 VC</div>
+        <div>≈ $5.00</div>
+      </div>
+      <div class="stat-box">
+        <div>Seu Nível</div>
+        <div class="stat-value">15</div>
+        <div>Próximo nível em: 250 XP</div>
+      </div>
+      <div class="stat-box">
+        <div>Tokens Criados</div>
+        <div class="stat-value">8</div>
+        <div>Valor total: 3,400 VC</div>
+      </div>
+    </div>
+    
+    <div class="input-group">
+      <input id="wordInput" type="text" placeholder="Digite sua palavra ou frase valiosa">
+      <select id="wordCategory">
+        <option value="general">Geral</option>
+        <option value="meme">Meme</option>
+        <option value="slogan">Slogan</option>
+        <option value="brand">Nome de Marca</option>
+        <option value="poetry">Poesia</option>
+      </select>
+    </div>
+    
+    <div>
+      <button onclick="tokenizeWord()">Tokenizar (10 VC)</button>
+      <button class="button-secondary" onclick="checkOriginality()">Verificar Originalidade</button>
+    </div>
+    
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('tokens')">Meus Tokens</div>
+        <div class="tab" onclick="switchTab('challenges')">Desafios</div>
+        <div class="tab" onclick="switchTab('battles')">Batalhas</div>
+        <div class="tab" onclick="switchTab('market')">Mercado</div>
+      </div>
+      
+      <div id="tokens" class="tab-content active">
+        <h3>Seus Ativos Digitais</h3>
+        
+        <div class="token-card">
+          <div class="token-title">"CriptoLiteratura"</div>
+          <div class="token-meta">
+            <span>Categoria: Literatura</span>
+            <span>Valor: 500 VC</span>
+          </div>
+          <div class="token-meta">
+            <span>Criado em: 15/06/2023</span>
+            <span>ID: #VB-4892</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 75%"></div>
+          </div>
+          <div class="token-meta">
+            <span>Popularidade: 75%</span>
+            <span>3 batalhas vencidas</span>
+          </div>
+          <div class="token-actions">
+            <button>Vender</button>
+            <button>Usar em Desafio</button>
+            <button>Detalhes</button>
+          </div>
+        </div>
+        
+        <div class="token-card">
+          <div class="token-title">"VerbaVerse"</div>
+          <div class="token-meta">
+            <span>Categoria: Nome de Marca</span>
+            <span>Valor: 800 VC</span>
+          </div>
+          <div class="token-meta">
+            <span>Criado em: 10/06/2023</span>
+            <span>ID: #VB-3781</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 90%"></div>
+          </div>
+          <div class="token-meta">
+            <span>Popularidade: 90%</span>
+            <span>5 batalhas vencidas</span>
+          </div>
+          <div class="token-actions">
+            <button>Vender</button>
+            <button>Usar em Desafio</button>
+            <button>Detalhes</button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="challenges" class="tab-content">
+        <h3>Desafios Diários</h3>
+        
+        <div class="challenge-card">
+          <div class="challenge-title">Crie um slogan para um produto tecnológico</div>
+          <div>Recompensa: 150 VC + 50 XP</div>
+          <div>Tempo restante: 8h 22m</div>
+          <button class="pulse">Participar</button>
+        </div>
+        
+        <div class="challenge-card">
+          <div class="challenge-title">Invente um neologismo sobre o futuro</div>
+          <div>Recompensa: 200 VC + 75 XP</div>
+          <div>Tempo restante: 12h 45m</div>
+          <button class="pulse">Participar</button>
+        </div>
+      </div>
+      
+      <div id="battles" class="tab-content">
+        <h3>Batalhas de Palavras</h3>
+        
+        <div class="battle-container">
+          <div class="battle-option selected">
+            <div>"Metaverso Criativo"</div>
+            <div class="battle-votes">65% (1,302 votos)</div>
+          </div>
+          <div class="battle-option">
+            <div>"Universo Digital"</div>
+            <div class="battle-votes">35% (701 votos)</div>
+          </div>
+        </div>
+        
+        <button>Votar (5 VC)</button>
+        <button>Submeter seu Token</button>
+        
+        <div class="challenge-card" style="margin-top: 30px;">
+          <div class="challenge-title">Próxima Batalha: Melhor slogan para café</div>
+          <div>Inscrições abertas por: 2d 4h</div>
+          <div>Prêmio: 500 VC para o vencedor</div>
+          <button>Inscrever Token</button>
+        </div>
+      </div>
+      
+      <div id="market" class="tab-content">
+        <h3>Mercado VerbaCoin</h3>
+        
+        <div class="input-group" style="margin-bottom: 20px;">
+          <input type="text" placeholder="Buscar tokens...">
+          <button>Buscar</button>
+        </div>
+        
+        <div class="token-card">
+          <div class="token-title">"BlockPoet"</div>
+          <div class="token-meta">
+            <span>Vendedor: @Palavreiro</span>
+            <span>Preço: 1,200 VC</span>
+          </div>
+          <div class="token-meta">
+            <span>Categoria: Nome de Marca</span>
+            <span>Popularidade: 88%</span>
+          </div>
+          <div class="token-actions">
+            <button>Comprar</button>
+            <button>Ofertar</button>
+            <button>Detalhes</button>
+          </div>
+        </div>
+        
+        <div class="token-card">
+          <div class="token-title">"NFTalógico"</div>
+          <div class="token-meta">
+            <span>Vendedor: @CriptoArt</span>
+            <span>Preço: 750 VC</span>
+          </div>
+          <div class="token-meta">
+            <span>Categoria: Meme</span>
+            <span>Popularidade: 92%</span>
+          </div>
+          <div class="token-actions">
+            <button>Comprar</button>
+            <button>Ofertar</button>
+            <button>Detalhes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dados do jogo
+    const gameData = {
+      balance: 1250,
+      level: 15,
+      xp: 750,
+      nextLevelXp: 1000,
+      tokens: [
+        {
+          id: "VB-4892",
+          title: "CriptoLiteratura",
+          category: "literature",
+          value: 500,
+          created: "15/06/2023",
+          popularity: 75,
+          battlesWon: 3
+        },
+        {
+          id: "VB-3781",
+          title: "VerbaVerse",
+          category: "brand",
+          value: 800,
+          created: "10/06/2023",
+          popularity: 90,
+          battlesWon: 5
+        }
+      ],
+      challenges: [
+        {
+          title: "Crie um slogan para um produto tecnológico",
+          reward: { coins: 150, xp: 50 },
+          timeLeft: "8h 22m"
+        },
+        {
+          title: "Invente um neologismo sobre o futuro",
+          reward: { coins: 200, xp: 75 },
+          timeLeft: "12h 45m"
+        }
+      ],
+      currentBattle: {
+        options: [
+          { text: "Metaverso Criativo", votes: 1302, percentage: 65 },
+          { text: "Universo Digital", votes: 701, percentage: 35 }
+        ],
+        nextBattle: {
+          title: "Melhor slogan para café",
+          timeLeft: "2d 4h",
+          prize: 500
+        }
+      },
+      marketItems: [
+        {
+          id: "VB-6723",
+          title: "BlockPoet",
+          seller: "@Palavreiro",
+          price: 1200,
+          category: "brand",
+          popularity: 88
+        },
+        {
+          id: "VB-8914",
+          title: "NFTalógico",
+          seller: "@CriptoArt",
+          price: 750,
+          category: "meme",
+          popularity: 92
+        }
+      ]
+    };
+
+    // Funções do jogo
+    function switchTab(tabId) {
+      // Esconde todos os conteúdos de tab
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Remove a classe active de todas as tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Mostra o conteúdo da tab selecionada
+      document.getElementById(tabId).classList.add('active');
+      
+      // Adiciona a classe active à tab clicada
+      event.currentTarget.classList.add('active');
+    }
+
+    function tokenizeWord() {
+      const wordInput = document.getElementById('wordInput');
+      const word = wordInput.value.trim();
+      const category = document.getElementById('wordCategory').value;
+      
+      if (word !== "") {
+        // Aqui você adicionaria a lógica para enviar para o servidor/blockchain
+        alert(`"${word}" foi tokenizado com sucesso na categoria ${category}! +10 VC`);
+        
+        // Atualiza o saldo (simulação)
+        gameData.balance += 10;
+        updateUI();
+        
+        wordInput.value = "";
+      } else {
+        alert("Digite algo para tokenizar.");
+      }
+    }
+
+    function checkOriginality() {
+      const wordInput = document.getElementById('wordInput');
+      const word = wordInput.value.trim();
+      
+      if (word !== "") {
+        // Simulação de verificação de originalidade
+        const originalityScore = Math.floor(Math.random() * 100);
+        alert(`Sua palavra "${word}" tem ${originalityScore}% de originalidade!`);
+        
+        if (originalityScore > 70) {
+          alert("Ótimo! Esta palavra tem alta chance de ser valiosa no mercado.");
+        }
+      } else {
+        alert("Digite algo para verificar.");
+      }
+    }
+
+    function updateUI() {
+      document.getElementById('coinCount').textContent = gameData.balance.toLocaleString() + ' VC';
+      // Aqui você atualizaria outros elementos da UI conforme necessário
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      updateUI();
+      
+      // Simula um novo desafio aparecendo
+      setTimeout(() => {
+        const newChallenge = {
+          title: "Escreva um haikai sobre tecnologia",
+          reward: { coins: 180, xp: 60 },
+          timeLeft: "24h"
+        };
+        gameData.challenges.push(newChallenge);
+        
+        // Na aplicação real, você atualizaria a UI aqui
+        console.log("Novo desafio adicionado:", newChallenge);
+      }, 10000);
+    });
+  </script>
+</body>
+</html>
